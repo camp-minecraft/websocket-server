@@ -1,0 +1,23 @@
+{
+  "name": "campwebscoket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maple-1031/MinecraftWebSocket.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maple-1031/MinecraftWebSocket/issues"
+  },
+  "homepage": "https://github.com/maple-1031/MinecraftWebSocket#readme",
+  "dependencies": {
+    "websocket": "^1.0.34"
+  }
+}
