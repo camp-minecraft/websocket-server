@@ -1,3 +1,4 @@
+node_modules/*
 node_modules/.bin/node-gyp-build
 node_modules/.bin/node-gyp-build-optional
 node_modules/.bin/node-gyp-build-optional.cmd
