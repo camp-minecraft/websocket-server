@@ -25,13 +25,13 @@ MCEE Websocketサーバは、メンターと生徒のワールドをつなぐた
 
 1. コース毎に設置されたコマンドブロックが、クリアを検知し`/tellraw`コマンドでクリア情報をチャットに送信する。
 <details>
-<summary>クリア情報（json）</summary>
+<summary>送信情報例（JSON形式、詳細は後述）</summary>
 
 ```
 {
     "header": {
         "sender": "oishic"  #送信者（グループ）を識別
-        "type": "clear"     #送信情報の種類
+        "type": "clear"     #送信情報の種類["clear","init"]
     },
     "body": {
         "player": "テストタロウ"    #クリアした生徒の名前
@@ -42,3 +42,24 @@ MCEE Websocketサーバは、メンターと生徒のワールドをつなぐた
 </details>
 2. WSサーバがチャットを検知し、GAS APIを叩く。
 3. GASスクリプトが進捗管理表を変更する。
+
+
+### 送信情報
+#### クリア時
+例１
+<details>
+<summary>クリア時</summary>
+
+```
+{
+    "header": {
+        "sender": "oishic"  #送信者（グループ）を識別
+        "type": "clear"     #送信情報の種類["clear","init"]
+    },
+    "body": {
+        "player": "テストタロウ"    #クリアした生徒の名前
+        "course": "1"             #クリアしたコース
+    }
+}
+```
+</details>
