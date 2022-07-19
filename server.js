@@ -2,6 +2,13 @@ const WebSocket = require("ws");
 const app = require("express")();
 const server = require("http").Server(app);
 const uuid = require("uuid");
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+const fetch = require("node-fetch");
+
+const GAS_API_URL =
+"https://script.google.com/macros/s/AKfycbyAgeH65cJV2_wZKjCUmu-UAVNedl_3Buk08kFsl4zS_v0jhKLJPUOGN-_ntn3OHNYdsA/exec";
+//   "https://script.google.com/a/macros/ca-techkids.com/s/AKfycbyxdO8jvvVTpns9iTcRui9ONIfQv4Cp9Npmg6te3SRu/dev";
+
 
 const wss = new WebSocket.Server({
   port: 9999, // 9999ポートでWebSocketサーバーを待機
@@ -21,7 +28,7 @@ wss.on("connection", (ws) => {
       messagePurpose: "subscribe", // "subscribe" を指定
     },
     body: {
-      eventName: "PlayerMessage"
+      eventName: "PlayerMessage",
     },
   };
 
@@ -33,7 +40,7 @@ wss.on("connection", (ws) => {
       messagePurpose: "subscribe", // "subscribe" を指定
     },
     body: {
-      eventName: "BlockPlaced"
+      eventName: "BlockPlaced",
     },
   };
 
@@ -45,7 +52,7 @@ wss.on("connection", (ws) => {
       messagePurpose: "subscribe", // "subscribe" を指定
     },
     body: {
-      eventName: "AgentCommand"
+      eventName: "AgentCommand",
     },
   };
 
@@ -57,7 +64,7 @@ wss.on("connection", (ws) => {
       messagePurpose: "subscribe", // "subscribe" を指定
     },
     body: {
-      eventName: "AgentCommand"
+      eventName: "PlayerTeleported",
     },
   };
   // イベント購読用のJSONをシリアライズ（文字列化）して送信
@@ -68,20 +75,19 @@ wss.on("connection", (ws) => {
 
   // マイクラからメッセージが届いた際の処理を定義
   ws.on("message", (rawData) => {
-    console.log(rawData);
     const data = JSON.parse(rawData); // 生メッセージをオブジェクトに変換
     console.log(data);
-    let sendcmd = "test";
+    let sendcmd = "testforblock ~ ~-1 ~ grass";
     if (data.body.eventName == "PlayerMessage") {
       const msg = data.body.properties.Message;
-      const cmd = msg.split(" ")[0];
-      const subcmd = msg.split(" ")[1];
-      if (cmd == "tp") {
-        if (subcmd == "0") {
-          sendcmd = "tp oishic 20 6 30";
-        } else if (subcmd == "1") {
-          sendcmd = "tp oishic 49 5 104";
-        }
+      const msgJson = JSON.parse(msg);
+      switch (msgJson.header.type) {
+        case "clear":
+          commitClear(msgJson.body.player, msgJson.body.course);
+          break;
+
+        default:
+          break;
       }
     }
     if (!data.body.eventName) {
@@ -112,10 +118,35 @@ wss.on("connection", (ws) => {
 
     // コマンド発行用のJSONをシリアライズ（文字列化）して送信
     ws.send(JSON.stringify(commandRequestMessageJSON));
-    // console.log(wss.clients);
-    // wss.clients.forEach(client => {
-    //     client.send("response");
-    // })
-    // ws.send("response");
   });
 });
+
+function commitClear(player, course) {
+  var SendDATA = {
+    player: player,
+    course: course,
+  };
+  var postparam = {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: JSON.stringify(SendDATA),
+  };
+  fetch(GAS_API_URL, postparam)
+    .then((response) => console.log("Success:", response))
+    .catch((error) => console.error("Error:", error));
+  //   let newPost = new XMLHttpRequest();
+  //   newPost.open("POST", GAS_API_URL);
+  //   newPost.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+  //   newPost.send(`player=${player}&course=${course}`);
+  //   newPost.onload = function() {
+  //     console.log(newPost);
+  //     if (newPost.status != 200) { // レスポンスの HTTP ステータスを解析
+  //       console.log(`Error ${newPost.status}: ${newPost.statusText}`); // e.g. 404: Not Found
+  //     } else { // show the result
+  //       console.log(`Done, got ${newPost.response.length} bytes`); // responseText is the server
+  //     }
+  //   };
+}
