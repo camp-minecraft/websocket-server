@@ -137,16 +137,4 @@ function commitClear(player, course) {
   fetch(GAS_API_URL, postparam)
     .then((response) => console.log("Success:", response))
     .catch((error) => console.error("Error:", error));
-  //   let newPost = new XMLHttpRequest();
-  //   newPost.open("POST", GAS_API_URL);
-  //   newPost.setRequestHeader("content-type", "application/x-www-form-urlencoded");
-  //   newPost.send(`player=${player}&course=${course}`);
-  //   newPost.onload = function() {
-  //     console.log(newPost);
-  //     if (newPost.status != 200) { // レスポンスの HTTP ステータスを解析
-  //       console.log(`Error ${newPost.status}: ${newPost.statusText}`); // e.g. 404: Not Found
-  //     } else { // show the result
-  //       console.log(`Done, got ${newPost.response.length} bytes`); // responseText is the server
-  //     }
-  //   };
 }
