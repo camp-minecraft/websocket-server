@@ -4,11 +4,11 @@ const server = require("http").Server(app);
 const uuid = require("uuid");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const fetch = require("node-fetch");
+const { response } = require("express");
 
 const GAS_API_URL =
-"https://script.google.com/macros/s/AKfycbyAgeH65cJV2_wZKjCUmu-UAVNedl_3Buk08kFsl4zS_v0jhKLJPUOGN-_ntn3OHNYdsA/exec";
+  "https://script.google.com/macros/s/AKfycbyAgeH65cJV2_wZKjCUmu-UAVNedl_3Buk08kFsl4zS_v0jhKLJPUOGN-_ntn3OHNYdsA/exec";
 //   "https://script.google.com/a/macros/ca-techkids.com/s/AKfycbyxdO8jvvVTpns9iTcRui9ONIfQv4Cp9Npmg6te3SRu/dev";
-
 
 const wss = new WebSocket.Server({
   port: 9999, // 9999ポートでWebSocketサーバーを待機
@@ -76,12 +76,20 @@ wss.on("connection", (ws) => {
   // マイクラからメッセージが届いた際の処理を定義
   ws.on("message", (rawData) => {
     const data = JSON.parse(rawData); // 生メッセージをオブジェクトに変換
-    console.log(data);
-    let sendcmd = "testforblock ~ ~-1 ~ grass";
+    console.log("data: ", data);
+    let sendcmd = "";
     if (data.body.eventName == "PlayerMessage") {
       const msg = data.body.properties.Message;
       const msgJson = JSON.parse(msg);
+      console.log("msgJson: ", msgJson);
       switch (msgJson.header.type) {
+        case "init":
+          initWorld(msgJson.body.group);
+          sendcmd = "setblock 12 5 -2 stone";
+        fetch(GAS_API_URL + `?type=init&group=${msgJson.body.group}`)
+          .then((response) => console.log("response: ", response))
+          .catch((error) => console.log("error", error));
+          break;
         case "clear":
           commitClear(msgJson.body.player, msgJson.body.course);
           break;
@@ -117,9 +125,13 @@ wss.on("connection", (ws) => {
     };
 
     // コマンド発行用のJSONをシリアライズ（文字列化）して送信
-    ws.send(JSON.stringify(commandRequestMessageJSON));
+    if (sendcmd !== "") {
+      ws.send(JSON.stringify(commandRequestMessageJSON));
+    }
   });
 });
+
+function initWorld(group) {}
 
 function commitClear(player, course) {
   var SendDATA = {

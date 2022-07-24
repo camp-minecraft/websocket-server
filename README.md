@@ -45,16 +45,23 @@ MCEE Websocketサーバは、メンターと生徒のワールドをつなぐた
 
 
 ### 送信情報
-#### クリア時
-例１
-<details>
-<summary>クリア時</summary>
-
+すべての送信情報には、共通のヘッダーが付与される。
 ```
 {
     "header": {
         "sender": "oishic"  #送信者（グループ）を識別
-        "type": "clear"     #送信情報の種類["clear","init"]
+        "type": "clear"     #送信情報の種類
+    }
+}
+```
+`type`の値によって、WSサーバで行う処理がswitchされる。
+
+#### クリア時(`type:"clear"`)
+```
+{
+    "header": {
+        "sender": "oishic"  #送信者（グループ）を識別
+        "type": "clear"     #送信情報の種類
     },
     "body": {
         "player": "テストタロウ"    #クリアした生徒の名前
@@ -62,4 +69,3 @@ MCEE Websocketサーバは、メンターと生徒のワールドをつなぐた
     }
 }
 ```
-</details>
