@@ -1,0 +1,214 @@
+{
+  body: {
+    eventName: 'PlayerMessage',
+    measurements: null,
+    properties: {
+      AccountType: 1,
+      ActiveSessionID: 'c45711b9-18e2-419b-94ec-c856dd34fe31',
+      AppSessionID: '0fed22b7-89f6-48ff-bfc4-23f828983817',
+      Biome: 1,
+      Build: '1.17.32',
+      BuildNum: '8421338',
+      BuildPlat: 3,
+      Cheevos: false,
+      CurrentNumDevices: 1,
+      DeviceSessionId: '0fed22b7-89f6-48ff-bfc4-23f828983817',
+      Difficulty: 'PEACEFUL',
+      Dim: 0,
+      DnAPlat: 'Apple,D,,',
+      GlobalMultiplayerCorrelationId: '921ad2c9-8fc5-4a20-9a7a-a5662473d64c',
+      Message: 'test',
+      MessageType: 'chat',
+      Mode: 1,
+      NetworkType: 0,
+      Plat: 'MacOS Version 10.15.7 (Build 19H2)',
+      PlayerGameMode: 1,
+      Role: 0,
+      Sender: 'oishic',
+      Seq: 124,
+      WorldFeature: 0,
+      WorldSessionId: '19ceeb60-f081-4952-b4d1-b74bd6aaa1a8',
+      isTrial: 0,
+      isUnderground: false,
+      locale: 'ja_JP',
+      vrMode: false
+    }
+  },
+  header: {
+    messagePurpose: 'event',
+    requestId: '00000000-0000-0000-0000-000000000000',
+    version: 1
+  }
+}
+{
+  body: {
+    statusCode: -2147483648,
+    statusMessage: '構文エラー: "test": at ">>test<<" は無効です'
+  },
+  header: {
+    messagePurpose: 'commandResponse',
+    requestId: '19415f3f-2643-4480-a4cf-e3c032bf79c9',
+    version: 1
+  }
+}
+
+{
+  body: {
+    eventName: 'BlockPlaced',
+    measurements: { Count: 1 },
+    properties: {
+      AccountType: 1,
+      ActiveSessionID: 'c45711b9-18e2-419b-94ec-c856dd34fe31',
+      AppSessionID: '0fed22b7-89f6-48ff-bfc4-23f828983817',
+      AuxType: 0,
+      Biome: 1,
+      Block: 'planks',
+      Build: '1.17.32',
+      BuildNum: '8421338',
+      BuildPlat: 3,
+      Cheevos: false,
+      CurrentNumDevices: 1,
+      DeviceSessionId: '0fed22b7-89f6-48ff-bfc4-23f828983817',
+      Difficulty: 'PEACEFUL',
+      Dim: 0,
+      DnAPlat: 'Apple,D,,',
+      GlobalMultiplayerCorrelationId: '921ad2c9-8fc5-4a20-9a7a-a5662473d64c',
+      Mode: 1,
+      Namespace: 'minecraft',
+      NetworkType: 0,
+      PlacementMethod: 0,
+      Plat: 'MacOS Version 10.15.7 (Build 19H2)',
+      PlayerGameMode: 1,
+      Role: 0,
+      ToolItemType: 'planks',
+      Type: 5,
+      WorldFeature: 0,
+      WorldSessionId: '19ceeb60-f081-4952-b4d1-b74bd6aaa1a8',
+      isTrial: 0,
+      isUnderground: false,
+      locale: 'ja_JP',
+      vrMode: false
+    }
+  },
+  header: {
+    messagePurpose: 'event',
+    requestId: '00000000-0000-0000-0000-000000000000',
+    version: 1
+  }
+}
+{
+  body: {
+    statusCode: -2147483648,
+    statusMessage: '構文エラー: "test": at ">>test<<" は無効です'
+  },
+  header: {
+    messagePurpose: 'commandResponse',
+    requestId: '44a963c1-27b9-415d-8014-1cbc3f405857',
+    version: 1
+  }
+}
+
+{
+  body: {
+    eventName: 'PlayerTeleported',
+    measurements: null,
+    properties: {
+      AccountType: 1,
+      ActiveSessionID: 'c45711b9-18e2-419b-94ec-c856dd34fe31',
+      AppSessionID: '0fed22b7-89f6-48ff-bfc4-23f828983817',
+      Biome: 0,
+      Build: '1.17.32',
+      BuildNum: '8421338',
+      BuildPlat: 3,
+      Cheevos: false,
+      CurrentNumDevices: 1,
+      DeviceSessionId: '0fed22b7-89f6-48ff-bfc4-23f828983817',
+      Difficulty: 'PEACEFUL',
+      Dim: 0,
+      DnAPlat: 'Apple,D,,',
+      GlobalMultiplayerCorrelationId: '0e0d8957-7a81-4044-aa19-d7900792aa45',
+      MetersTravelled: 1.379990100860596,
+      Mode: 1,
+      NetworkType: 0,
+      Plat: 'MacOS Version 10.15.7 (Build 19H2)',
+      PlayerGameMode: 1,
+      Role: 0,
+      TeleportationCause: 3,
+      TeleportationItem: 1,
+      WorldFeature: 0,
+      WorldSessionId: 'bd6360ef-7076-429d-bdcd-47a173f60bac',
+      isTrial: 0,
+      isUnderground: false,
+      locale: 'ja_JP',
+      vrMode: false
+    }
+  },
+  header: {
+    messagePurpose: 'event',
+    requestId: '00000000-0000-0000-0000-000000000000',
+    version: 1
+  }
+}
+{
+  body: {
+    statusCode: -2147483648,
+    statusMessage: '構文エラー: "test": at ">>test<<" は無効です'
+  },
+  header: {
+    messagePurpose: 'commandResponse',
+    requestId: 'ca14a593-2b4f-4c0e-b577-a3c9497c2e26',
+    version: 1
+  }
+}
+
+{
+  body: {
+    eventName: 'AgentCommand',
+    measurements: null,
+    properties: {
+      AccountType: 1,
+      ActiveSessionID: 'c45711b9-18e2-419b-94ec-c856dd34fe31',
+      AppSessionID: '0fed22b7-89f6-48ff-bfc4-23f828983817',
+      Biome: 1,
+      Build: '1.17.32',
+      BuildNum: '8421338',
+      BuildPlat: 3,
+      Cheevos: false,
+      CurrentNumDevices: 1,
+      DeviceSessionId: '0fed22b7-89f6-48ff-bfc4-23f828983817',
+      Difficulty: 'PEACEFUL',
+      Dim: 0,
+      DnAPlat: 'Apple,D,,',
+      GlobalMultiplayerCorrelationId: '0e0d8957-7a81-4044-aa19-d7900792aa45',
+      Mode: 1,
+      NetworkType: 0,
+      Plat: 'MacOS Version 10.15.7 (Build 19H2)',
+      PlayerGameMode: 1,
+      Result: '{"commandName":"move","success":true}\n',
+      Role: 0,
+      Seq: 211,
+      WorldFeature: 0,
+      WorldSessionId: 'bd6360ef-7076-429d-bdcd-47a173f60bac',
+      isTrial: 0,
+      isUnderground: false,
+      locale: 'ja_JP',
+      vrMode: false
+    }
+  },
+  header: {
+    messagePurpose: 'event',
+    requestId: '00000000-0000-0000-0000-000000000000',
+    version: 1
+  }
+}
+{
+  body: {
+    statusCode: -2147483648,
+    statusMessage: '構文エラー: "test": at ">>test<<" は無効です'
+  },
+  header: {
+    messagePurpose: 'commandResponse',
+    requestId: '7e53ee2a-6889-4391-9f43-ce9030c55727',
+    version: 1
+  }
+}

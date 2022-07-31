@@ -80,7 +80,13 @@ wss.on("connection", (ws) => {
     let sendcmd = "";
     if (data.body.eventName == "PlayerMessage") {
       const msg = data.body.properties.Message;
-      const msgJson = JSON.parse(msg);
+      try {
+        const msgJson = JSON.parse(msg);
+      } catch (error) {
+        if (msg.charAt(0) == "?") {
+          
+        }
+      }
       console.log("msgJson: ", msgJson);
       switch (msgJson.header.type) {
         case "init":
