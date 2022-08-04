@@ -2,9 +2,9 @@ const WebSocket = require("ws");
 const app = require("express")();
 const server = require("http").Server(app);
 const uuid = require("uuid");
-const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const fetch = require("node-fetch");
 const { response } = require("express");
+const { create } = require("domain");
 
 const GAS_API_URL =
     "https://script.google.com/macros/s/AKfycbyAgeH65cJV2_wZKjCUmu-UAVNedl_3Buk08kFsl4zS_v0jhKLJPUOGN-_ntn3OHNYdsA/exec";
@@ -83,25 +83,42 @@ wss.on("connection", (ws) => {
             try {
                 const msgJson = JSON.parse(msg);
                 console.log("msgJson: ", msgJson);
+                switch (msgJson.header.type) {
+                    case "init":
+                        sendcmd = "setblock 12 5 -2 stone";
+                        const headers = {
+                            "Accept-Encoding": "identity"
+                        };
+                        fetch(GAS_API_URL + `?type=init&group=${msgJson.body.group}`, { redirect: "follow", headers: headers })
+                            .then((response) => {
+                                console.log("response: ", Buffer.from(response.body._readableState.buffer.head.data, "hex").toString());
+                                let membersData = Buffer.from(response.body._readableState.buffer.head.data, "hex").toString();
+                                let groupMembers = createMembersData(membersData);
+                                console.log(groupMembers);
+                                // ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives remove name")));
+                                // ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives add name dummy")));
+                                ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives remove days")));
+                                ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives add days dummy")));
+                                groupMembers.forEach(element => {
+                                    // ws.send(JSON.stringify(generateCommandRequest(`/scoreboard players set oishic name ${element.name}`)));
+                                    ws.send(JSON.stringify(generateCommandRequest(`/scoreboard players set oishic days ${Number(element.days.charAt(0))}`)));
+                                });
+                            })
+                            .catch((error) => {
+                                console.log("error", error)
+                            });
+                        break;
+                    case "clear":
+                        commitClear(msgJson.body.player, msgJson.body.course);
+                        break;
+
+                    default:
+                        break;
+                }
             } catch (error) {
                 if (msg.charAt(0) == "?") {
                     sendCommand(msg, ws);
                 }
-            }
-            switch (msgJson.header.type) {
-                case "init":
-                    initWorld(msgJson.body.group);
-                    sendcmd = "setblock 12 5 -2 stone";
-                    fetch(GAS_API_URL + `?type=init&group=${msgJson.body.group}`)
-                        .then((response) => console.log("response: ", response))
-                        .catch((error) => console.log("error", error));
-                    break;
-                case "clear":
-                    commitClear(msgJson.body.player, msgJson.body.course);
-                    break;
-
-                default:
-                    break;
             }
         }
         if (!data.body.eventName) {
@@ -120,10 +137,19 @@ wss.on("connection", (ws) => {
     });
 });
 
-function initWorld(group) { }
+function createMembersData(membersData) {
+    let _membersDataJSON = JSON.parse(membersData);
+    console.log(_membersDataJSON);
+    let membersDataJSON = [];
+    console.log(Object.values(_membersDataJSON.body.member), _membersDataJSON.body.days);
+    for (let [name, days] of zip(Object.values(_membersDataJSON.body.member), Object.values(_membersDataJSON.body.days))) {
+        membersDataJSON.push({ name, days });
+    }
+    return membersDataJSON;
+}
 
 function commitClear(player, course) {
-    var SendDATA = {
+    var sendData = {
         player: player,
         course: course,
     };
@@ -133,7 +159,7 @@ function commitClear(player, course) {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: JSON.stringify(SendDATA),
+        body: JSON.stringify(sendData),
     };
     fetch(GAS_API_URL, postparam)
         .then((response) => console.log("Success:", response))
@@ -141,7 +167,9 @@ function commitClear(player, course) {
 }
 
 function sendCommand(msg, ws) {
-    sendCmd = "/" + msg.split("?")[1];
+    if (msg.charAt(0) == "?") {
+        sendCmd = "/" + msg.split("?")[1];
+    }
     ws.send(JSON.stringify(generateCommandRequest(sendCmd)));
 }
 
@@ -162,4 +190,23 @@ function generateCommandRequest(cmd) {
         },
     };
     return commandRequestMessageJSON;
+}
+
+function* zip(...args) {
+
+    const length = args[0].length;
+
+    for (let arr of args) {
+        if (arr.length !== length) {
+            throw "Lengths of arrays are not eqaul.";
+        }
+    }
+
+    for (let index = 0; index < length; index++) {
+        let elms = [];
+        for (arr of args) {
+            elms.push(arr[index]);
+        }
+        yield elms;
+    }
 }
