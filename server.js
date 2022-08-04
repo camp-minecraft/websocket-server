@@ -85,28 +85,7 @@ wss.on("connection", (ws) => {
                 console.log("msgJson: ", msgJson);
                 switch (msgJson.header.type) {
                     case "init":
-                        sendcmd = "setblock 12 5 -2 stone";
-                        const headers = {
-                            "Accept-Encoding": "identity"
-                        };
-                        fetch(GAS_API_URL + `?type=init&group=${msgJson.body.group}`, { redirect: "follow", headers: headers })
-                            .then((response) => {
-                                console.log("response: ", Buffer.from(response.body._readableState.buffer.head.data, "hex").toString());
-                                let membersData = Buffer.from(response.body._readableState.buffer.head.data, "hex").toString();
-                                let groupMembers = createMembersData(membersData);
-                                console.log(groupMembers);
-                                // ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives remove name")));
-                                // ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives add name dummy")));
-                                ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives remove days")));
-                                ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives add days dummy")));
-                                groupMembers.forEach(element => {
-                                    // ws.send(JSON.stringify(generateCommandRequest(`/scoreboard players set oishic name ${element.name}`)));
-                                    ws.send(JSON.stringify(generateCommandRequest(`/scoreboard players set oishic days ${Number(element.days.charAt(0))}`)));
-                                });
-                            })
-                            .catch((error) => {
-                                console.log("error", error)
-                            });
+                        initWorld(msgJson.body.group);
                         break;
                     case "clear":
                         commitClear(msgJson.body.player, msgJson.body.course);
@@ -136,6 +115,27 @@ wss.on("connection", (ws) => {
         }
     });
 });
+
+function initWorld(group) {
+    const headers = {
+        "Accept-Encoding": "identity"
+    };
+    fetch(GAS_API_URL + `?type=init&group=${msgJson.body.group}`, { redirect: "follow", headers: headers })
+        .then((response) => {
+            console.log("response: ", Buffer.from(response.body._readableState.buffer.head.data, "hex").toString());
+            let membersData = Buffer.from(response.body._readableState.buffer.head.data, "hex").toString();
+            let groupMembers = createMembersData(membersData);
+            console.log(groupMembers);
+            ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives remove days")));
+            ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives add days dummy")));
+            groupMembers.forEach(element => {
+                ws.send(JSON.stringify(generateCommandRequest(`/scoreboard players set oishic days ${Number(element.days.charAt(0))}`)));
+            });
+        })
+        .catch((error) => {
+            console.log("error", error)
+        });
+}
 
 function createMembersData(membersData) {
     let _membersDataJSON = JSON.parse(membersData);
