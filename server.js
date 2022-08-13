@@ -8,7 +8,7 @@ const { create } = require("domain");
 
 const GAS_API_URL =
     "https://script.google.com/macros/s/AKfycbyAgeH65cJV2_wZKjCUmu-UAVNedl_3Buk08kFsl4zS_v0jhKLJPUOGN-_ntn3OHNYdsA/exec";
-//   "https://script.google.com/a/macros/ca-techkids.com/s/AKfycbyxdO8jvvVTpns9iTcRui9ONIfQv4Cp9Npmg6te3SRu/dev";
+// "https://script.google.com/macros/s/AKfycbyxdO8jvvVTpns9iTcRui9ONIfQv4Cp9Npmg6te3SRu/dev";
 
 const wss = new WebSocket.Server({
     port: 9999, // 9999ポートでWebSocketサーバーを待機
@@ -69,15 +69,14 @@ wss.on("connection", (ws) => {
     };
     // イベント購読用のJSONをシリアライズ（文字列化）して送信
     ws.send(JSON.stringify(subscribeMessageJSON));
-    ws.send(JSON.stringify(subscribeBlockJSON));
-    ws.send(JSON.stringify(subscribeAgentJSON));
-    ws.send(JSON.stringify(subscribeTpJSON));
+    // ws.send(JSON.stringify(subscribeBlockJSON));
+    // ws.send(JSON.stringify(subscribeAgentJSON));
+    // ws.send(JSON.stringify(subscribeTpJSON));
 
     // マイクラからメッセージが届いた際の処理を定義
     ws.on("message", (rawData) => {
         const data = JSON.parse(rawData); // 生メッセージをオブジェクトに変換
-        console.log("data: ", data);
-        let sendcmd = "";
+        console.log(data);
         if (data.body.eventName == "PlayerMessage") {
             const msg = data.body.properties.Message;
             try {
@@ -108,42 +107,69 @@ wss.on("connection", (ws) => {
         if (ws.readyState !== WebSocket.OPEN) {
             return; // WebSocketがOPEN状態でない場合は処理を抜ける
         }
-
-        // コマンド発行用のJSONをシリアライズ（文字列化）して送信
-        if (sendcmd !== "") {
-            ws.send(JSON.stringify(generateCommandRequest(sendcmd)));
-        }
     });
+    function initWorld(group) {
+        const headers = { "Accept-Encoding": "identity" };
+        console.log(GAS_API_URL + `?type=init&group=${group}`);
+        fetch(GAS_API_URL + `?type=init&group=${group}`, { redirect: "follow", headers: headers })
+            .then((response) => {
+                let membersData = Buffer.from(response.body._readableState.buffer.head.data, "hex").toString();
+                let groupMembers = createMembersData(membersData);
+                console.log(groupMembers);
+                sendInitWorld(groupMembers);
+            })
+            .catch((error) => {
+                console.log("error", error)
+            });
+    }
+
+    function sendCommand(msg) {
+        let sendCmd;
+        if (msg.charAt(0) == "?") {
+            sendCmd = "/" + msg.split("?")[1];
+        } else {
+            sendCmd = msg;
+        }
+        console.log(sendCmd);
+        ws.send(JSON.stringify(generateCommandRequest(sendCmd)));
+    }
+
+    function sendInitWorld(groupMembers) {
+        //スコアボードのリセット
+        sendCommand("/scoreboard objectives remove days");
+        sendCommand("/scoreboard objectives add days dummy");
+        //IDとDaysの紐付け
+        groupMembers.forEach(element => {
+            sendCommand(`/scoreboard players set ${element.account} days ${Number(element.days.charAt(0))}`);
+        });
+        //ワールドの生成
+        //コースの生成
+
+        //プレーヤーのセット
+
+        //エージェントのスポーン
+
+    }
 });
 
-function initWorld(group) {
-    const headers = {
-        "Accept-Encoding": "identity"
-    };
-    fetch(GAS_API_URL + `?type=init&group=${msgJson.body.group}`, { redirect: "follow", headers: headers })
-        .then((response) => {
-            console.log("response: ", Buffer.from(response.body._readableState.buffer.head.data, "hex").toString());
-            let membersData = Buffer.from(response.body._readableState.buffer.head.data, "hex").toString();
-            let groupMembers = createMembersData(membersData);
-            console.log(groupMembers);
-            ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives remove days")));
-            ws.send(JSON.stringify(generateCommandRequest("/scoreboard objectives add days dummy")));
-            groupMembers.forEach(element => {
-                ws.send(JSON.stringify(generateCommandRequest(`/scoreboard players set oishic days ${Number(element.days.charAt(0))}`)));
-            });
-        })
-        .catch((error) => {
-            console.log("error", error)
-        });
-}
 
 function createMembersData(membersData) {
     let _membersDataJSON = JSON.parse(membersData);
     console.log(_membersDataJSON);
     let membersDataJSON = [];
-    console.log(Object.values(_membersDataJSON.body.member), _membersDataJSON.body.days);
-    for (let [name, days] of zip(Object.values(_membersDataJSON.body.member), Object.values(_membersDataJSON.body.days))) {
-        membersDataJSON.push({ name, days });
+    for (let [name, account, days, coord] of zip(
+        Object.values(_membersDataJSON.body.member),
+        Object.values(_membersDataJSON.body.account),
+        Object.values(_membersDataJSON.body.days),
+        Object.values(_membersDataJSON.body.coord),
+    )) {
+        membersDataJSON.push(
+            {
+                "name": name,
+                "account": account,
+                "days": days,
+                "coord": coord,
+            });
     }
     return membersDataJSON;
 }
@@ -158,6 +184,7 @@ function commitClear(player, course) {
         mode: "no-cors",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
+            "Accept-Encoding": "identity",
         },
         body: JSON.stringify(sendData),
     };
@@ -166,12 +193,6 @@ function commitClear(player, course) {
         .catch((error) => console.error("Error:", error));
 }
 
-function sendCommand(msg, ws) {
-    if (msg.charAt(0) == "?") {
-        sendCmd = "/" + msg.split("?")[1];
-    }
-    ws.send(JSON.stringify(generateCommandRequest(sendCmd)));
-}
 
 function generateCommandRequest(cmd) {
     const commandRequestMessageJSON = {
@@ -210,3 +231,9 @@ function* zip(...args) {
         yield elms;
     }
 }
+
+/*デバッグ用
+websocket = await import('ws')
+const ws = new websocket.WebSocket("ws://localhost:9999")
+ws.send('{"body":{"eventName":"PlayerMessage","properties":{"Message":"{\\"header\\":{\\"type\\":\\"init\\"},\\"body\\":{\\"group\\":\\"A\\"}}"}}}')
+*/
