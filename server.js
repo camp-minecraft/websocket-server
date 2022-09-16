@@ -77,17 +77,34 @@ wss.on("connection", (ws) => {
     ws.on("message", (rawData) => {
         const data = JSON.parse(rawData); // 生メッセージをオブジェクトに変換
         console.log(data);
-        if (data.body.eventName == "PlayerMessage") {
-            const msg = data.body.properties.Message;
+        if (data.header.eventName == "PlayerMessage") {
+            const msg = data.body.message;
             try {
-                const msgJson = JSON.parse(msg);
+                let msgJson = JSON.parse(msg);
+                if (msgJson.header == undefined) {
+                    let _msgJson = [];
+                    msgJson.rawtext.forEach((segment) => {
+                        _msgJson.push(segment.text);
+                    });
+                    let _ = _msgJson.join("")
+                    console.log(_, typeof(_));
+                    console.log(JSON.parse(_));
+                    msgJson = JSON.parse(_msgJson.join(""));
+                }
                 console.log("msgJson: ", msgJson);
                 switch (msgJson.header.type) {
                     case "init":
+                        console.log("[CASE:init]");
                         initWorld(msgJson.body.group);
                         break;
                     case "clear":
+                        console.log("[CASE:clear]");
                         commitClear(msgJson.body.player, msgJson.body.course);
+                        break;
+
+                    case "intro_agent":
+                        console.log("[CASE:intro_agent]");
+                        startAgentIntro(msgJson.body.player);
                         break;
 
                     default:
@@ -150,6 +167,19 @@ wss.on("connection", (ws) => {
         //エージェントのスポーン
 
     }
+
+    function startAgentIntro(player) {
+        sendCommand(`/execute ${player} ~ ~ ~ tp @c 27 15 25 90`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent turn left`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent move forward`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent move forward`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent destroy forward`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent move forward`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent destroy up`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent destroy right`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent move right`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent destroy up`);
+    }
 });
 
 
@@ -192,6 +222,7 @@ function commitClear(player, course) {
         .then((response) => console.log("Success:", response))
         .catch((error) => console.error("Error:", error));
 }
+
 
 
 function generateCommandRequest(cmd) {
