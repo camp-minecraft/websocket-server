@@ -169,16 +169,7 @@ wss.on("connection", (ws) => {
     }
 
     function startAgentIntro(player) {
-        sendCommand(`/execute ${player} ~ ~ ~ tp @c 27 15 25 90`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent turn left`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent move forward`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent move forward`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent destroy forward`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent move forward`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent destroy up`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent destroy right`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent move right`);
-        sendCommand(`/execute ${player} ~ ~ ~ agent destroy up`);
+        sendCommand(`/execute ${player} ~ ~ ~ agent tp -1 15 51 180`);
     }
 });
 
